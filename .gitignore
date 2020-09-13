@@ -1,0 +1,6 @@
+# Exlude the node.js files and directories
+node_modules/
+package-lock.json
+
+# Excluse the config file
+config.json

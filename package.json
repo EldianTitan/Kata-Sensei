@@ -1,0 +1,22 @@
+{
+  "name": "kata-sensei",
+  "version": "1.0.0",
+  "description": "A discord bot used to automatically check for completed challenges on Codewars.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EldianTitan/Kata-Sensei.git"
+  },
+  "author": "Jason Philippou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EldianTitan/Kata-Sensei/issues"
+  },
+  "homepage": "https://github.com/EldianTitan/Kata-Sensei#readme",
+  "dependencies": {
+    "discord.js": "^12.3.1"
+  }
+}
