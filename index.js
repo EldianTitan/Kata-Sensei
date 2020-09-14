@@ -9,13 +9,13 @@ command_registry = [
     {
         name: 'scanme',
         //channel: { type: 'text', name: 'general' },
-        callback: function(message) {
+        callback: function(message, args) {
             message.channel.send("Scanning...");
         }
     },
     {
         name: 'registerme',
-        callback: function(message) {
+        callback: function(message, args) {
             message.channel.send("Omae wa mou shindeiru!");
         }
     }
@@ -48,7 +48,7 @@ client.on('message', message => {
 
     for (const command of command_registry) {
         if (args[0] === command.name) {
-            command.callback(message);
+            command.callback(message, args);
             valid_command = true;
 
             break;
