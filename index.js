@@ -1,25 +1,7 @@
 const Discord = require('discord.js');
-const include = require('./include.js');
 
-// const path = require('path');
-// const fs = require('fs');
-
-//Register bot commands
-command_registry = [
-    {
-        name: 'scanme',
-        //channel: { type: 'text', name: 'general' },
-        callback: function(message, args) {
-            message.channel.send("Scanning...");
-        }
-    },
-    {
-        name: 'registerme',
-        callback: function(message, args) {
-            message.channel.send("Omae wa mou shindeiru!");
-        }
-    }
-]
+const path = require('path');
+const fs = require('fs');
 
 //Setup bot client instance
 const client = new Discord.Client();
@@ -27,6 +9,41 @@ const client = new Discord.Client();
 client.once('ready', () => {
     console.log('Kata-Sensei is ready!');
 });
+
+const config_file = require('./config.json');
+
+const user_data_dir = './user_data';
+if (!fs.existsSync(user_data_dir)) {
+    fs.mkdirSync(user_data_dir);
+}
+
+var user_data_file = `${user_data_dir}/user_data.json`;
+if (!fs.existsSync(user_data_file)) {
+    fs.writeFileSync(user_data_file, '');
+}
+
+var user_data = {};
+
+{
+    var user_data_contents = fs.readFileSync(user_data_file);
+    if (user_data_contents.toString().trim() != "") {
+        user_data = JSON.parse(user_data_contents);
+    }
+
+    if (user_data["users"] == null) {
+        user_data["users"] = {}
+    }
+}
+
+//Register bot commands
+command_registry = []
+
+for (var command_file of fs.readdirSync("./commands")) {
+    const command = require(`./commands/${command_file}`);
+    command_registry.push(command)
+
+    console.log(`Loading command '${command.name}'`);
+}
 
 //Command processing
 const sensei_command = '!sensei';
@@ -37,7 +54,6 @@ client.on('message', message => {
     //This is a Kata-Sensei command
     var args = message.content.slice(sensei_command.length).split(' ').filter(e => { return !(e === '') });
 
-    console.log(args);
     if (args.length == 0) {
         message.channel.send('Hmmmm... seems you forgot to specify a command!');
 
@@ -48,22 +64,45 @@ client.on('message', message => {
 
     for (const command of command_registry) {
         if (args[0] === command.name) {
-            command.callback(message, args);
+            command.callback(message, args, user_data);
             valid_command = true;
-
+            
             break;
         }
     }
 
     if (!valid_command) {
-        message.channel.send('Oops, I don\' understand the command you gave me!');
+        message.channel.send('Oops, I don\'t understand the command you gave me!');
 
         return;
     }
-
-    //Delete the message the user sent
-    message.delete();
 });
 
+//Create an event handler for when the bot terminates
+process.stdin.resume();
+
+function exitCallback(options, exitCode) {
+    if (options.cleanup) {
+        console.log("*In Darth Vader's voice*: Nooooooooo!");
+
+        const data = JSON.stringify(user_data);
+        fs.writeFileSync(user_data_file, data);
+    }
+    
+    if (options.exception) {
+        console.log("Uncaught exception");
+    }
+
+    if (options.exit) {
+        process.exit();
+    }
+}
+
+process.on('exit', exitCallback.bind(null, { cleanup: true }));
+process.on('SIGINT', exitCallback.bind(null, { exit: true }));
+process.on('SIGUSR1', exitCallback.bind(null, { exit: true }));
+process.on('SIGUSR2', exitCallback.bind(null, { exit: true }));
+//process.on('uncaughtException', exitCallback.bind(null, { exception: true, exit: true }));
+
 //Launch the bot
-client.login(include.config.token);
+client.login(config_file.token);

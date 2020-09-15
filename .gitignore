@@ -4,3 +4,6 @@ package-lock.json
 
 # Excluse the config file
 config.json
+
+# Excluse user data
+user_data/

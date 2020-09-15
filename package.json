@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/EldianTitan/Kata-Sensei#readme",
   "dependencies": {
+    "axios": "^0.20.0",
     "discord.js": "^12.3.1"
   }
 }
