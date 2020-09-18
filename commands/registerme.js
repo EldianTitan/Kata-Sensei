@@ -33,5 +33,6 @@ function execute(message, args, user_data) {
 
 module.exports = {
     name: "registerme",
+    needs_privilege: false,
     callback: execute
 }

@@ -1,15 +1,6 @@
 const axios = require('axios');
 
-//member.roles.cache.some(role => role.name === 'Mod');
 function execute(message, args, user_data) {
-    const is_moderator = message.member.roles.cache.some(role => role.name.toLowerCase().startsWith('moderator'));
-    const is_admin = message.member.hasPermission(['ADMINISTRATOR']);
-    
-    if (!is_moderator && !is_admin) {
-        message.channel.send("Hmmm, adequate permission you have not! Moderator you must be."); //Get it? Its Yoda.
-        return;
-    }
-
     if (args.length != 3) {
         message.channel.send("I don't understand the command. This is the correct syntax:" +
                              "`!sensei newkata <kata_level> <kata_id_or_slug>`");
@@ -43,5 +34,6 @@ function execute(message, args, user_data) {
 
 module.exports = {
     name: "newkata",
+    needs_privilege: true,
     callback: execute
 }

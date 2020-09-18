@@ -64,8 +64,19 @@ client.on('message', message => {
 
     for (const command of command_registry) {
         if (args[0] === command.name) {
-            command.callback(message, args, user_data);
             valid_command = true;
+
+            if (command) {
+                const is_moderator = message.member.roles.cache.some(role => role.name.toLowerCase().startsWith('moderator'));
+                const is_admin = message.member.hasPermission(['ADMINISTRATOR']);
+                
+                if (!is_moderator && !is_admin) {
+                    message.channel.send("Hmmm, adequate permission you have not! Moderator you must be."); //Get it? Its Yoda.
+                    break;
+                }
+            }
+
+            command.callback(message, args, user_data);
             
             break;
         }

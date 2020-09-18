@@ -25,5 +25,6 @@ function execute(message, args, user_data) {
 
 module.exports = {
     name: "scanme",
+    needs_privilege: false,
     callback: execute
 }
