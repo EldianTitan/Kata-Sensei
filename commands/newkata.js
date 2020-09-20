@@ -16,12 +16,16 @@ function execute(message, args, user_data) {
         .then(response => {
             message.channel.send(`Kata ${args[1]} has been set to \`${response.data.name}\`!`);
 
-            //Kata list does not exist
-            if (user_data["kata_list"] == null) {
-                user_data["kata_list"] = [];
+            if (user_data[message.guild.id] == null) {
+                user_data[message.guild.id] = {};
             }
 
-            user_data["kata_list"][args[1] - 1] = { "name": response.data.name, "id": args[2] };
+            //Kata list does not exist
+            if (user_data[message.guild.id]["kata_list"] == null) {
+                user_data[message.guild.id]["kata_list"] = [];
+            }
+
+            user_data[message.guild.id]["kata_list"][args[1] - 1] = { "name": response.data.name, "id": args[2] };
         })
         .catch(error => {
             if (error.response.status == 404) {

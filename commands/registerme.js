@@ -8,17 +8,27 @@ function execute(message, args, user_data) {
         //Check if username provided is corrent
         axios.get(`https://www.codewars.com/api/v1/users/${args[1]}`)
             .then(response => {
+                if (user_data[message.guild.id] == null) {
+                    user_data[message.guild.id] = {};
+                }
+
+                if (user_data[message.guild.id]["users"] == null) {
+                    user_data[message.guild.id]["users"] = {};
+                }
+
+                var guild_users = user_data[message.guild.id]["users"];
+
                 //Update user details
-                if (user_data["users"][message.author.username] == null) { //User not registered
+                if (guild_users[message.author.id] == null) { //User not registered
                     message.channel.send("Perfect, you have been registered! Have fun solving katas.");
 
-                    user_data["users"][message.author.username] = {
+                    guild_users[message.author.id] = {
                         "username": args[1]
                     };
                 } else { //User already registered
                     message.channel.send("Your account details have been updated!");
 
-                    user_data["users"][message.author.username]["username"] = args[1];
+                    guild_users[message.author.id]["username"] = args[1];
                 }
             })
             .catch(error => {
