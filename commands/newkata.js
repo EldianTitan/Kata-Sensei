@@ -39,5 +39,6 @@ function execute(message, args, user_data) {
 module.exports = {
     name: "newkata",
     needs_privilege: true,
+    channel_name: "moderators",
     callback: execute
 }

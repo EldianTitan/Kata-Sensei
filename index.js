@@ -62,7 +62,7 @@ client.on('message', message => {
         if (args[0] === command.name) {
             valid_command = true;
 
-            if (command) {
+            if (command.needs_privilege) {
                 const is_moderator = message.member.roles.cache.some(role => role.name.toLowerCase().startsWith('moderator'));
                 const is_admin = message.member.hasPermission(['ADMINISTRATOR']);
                 
@@ -72,7 +72,9 @@ client.on('message', message => {
                 }
             }
 
-            command.callback(message, args, user_data);
+            if (command.channel_name && message.channel.name === command.channel_name) {
+                command.callback(message, args, user_data);
+            }
             
             break;
         }
@@ -133,8 +135,6 @@ function narrowUpdateRoles(guild_id, user_id, user) {
 }
 
 function broadUpdateRoles() {
-    console.log("Broad update");
-
     for (const guild_id in user_data) {
         var guild_data = user_data[guild_id];
 

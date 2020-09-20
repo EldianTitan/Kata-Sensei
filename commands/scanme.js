@@ -92,5 +92,6 @@ function execute(message, args, user_data) {
 module.exports = {
     name: "scanme",
     needs_privilege: false,
+    channel_name: "submissions",
     callback: execute
 }
