@@ -17,17 +17,17 @@ function execute(message, args, user_data) {
         		 ' a help command but I think you already know that.'},
         		{ name: '\u200B', value: '\u200B' },
         		{ name: 'newkata', value: 'The way to use this command is ' +
-        		'`!sensei newkata <kata_level> <kata_id_or_slug>`' + ' this command is for assigning new katas'
+        		'`!sensei newkata <kata_level> <kata_id_or_slug>`' + ' this command is for assigning new katas.'
         		, inline: false },
         		{ name: '\u100B', value: '\u100B' },
         		{ name: 'registerme', value: 'The way to use this command is ' +
                         		'`!sensei registerme <codewars_username>`' +
-                        	    ' this command is for registering yourself for scans'
+                        	    ' this command is for registering yourself for scans.'
                         		, inline: false },
                 { name: '\u100B', value: '\u100B' },
                 { name: 'scanme', value: 'The way to use this command is ' +
                               '`!sensei scaneme`' +
-                              ' this command is for scanning and giving yourself roles REMEMBER TO REGISTER FIRST'
+                              ' this command is for scanning and giving yourself roles REMEMBER TO REGISTER FIRST!'
                                         		, inline: false }
         	)
         	.setImage('https://i.imgur.com/wSTFkRM.png')
