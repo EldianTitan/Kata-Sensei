@@ -40,6 +40,5 @@ function execute(message, args, user_data) {
 module.exports = {
     name: "help",
     needs_privilege: false,
-    channel_name: "general",
     callback: execute
 }

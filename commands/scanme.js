@@ -1,5 +1,9 @@
 const axios = require('axios');
 
+function handleRoleError(error) {
+    console.log(error);
+}
+
 function execute(message, args, user_data) {
     var author_data = null;
 
@@ -62,20 +66,20 @@ function execute(message, args, user_data) {
 
             //Clear existing roles
             var member_roles = message.member.roles;
-            member_roles.remove(role_god);
-            member_roles.remove(role_shogun);
-            member_roles.remove(role_ninja);
-            member_roles.remove(role_samurai);
-            
+            member_roles.remove(role_god).catch(handleRoleError);
+            member_roles.remove(role_shogun).catch(handleRoleError);
+            member_roles.remove(role_ninja).catch(handleRoleError);
+            member_roles.remove(role_samurai).catch(handleRoleError);
+
             //Assign roles
             if (completed_kata[0] && completed_kata[1] && completed_kata[2] && completed_kata[3]) {
-                member_roles.add(role_god);
+                member_roles.add(role_god).catch(handleRoleError);
             } else if (completed_kata[0] && completed_kata[1] && completed_kata[2]) {
-                member_roles.add(role_shogun);
+                member_roles.add(role_shogun).catch(handleRoleError);
             } else if (completed_kata[0] && completed_kata[1]) {
-                member_roles.add(role_ninja);
+                member_roles.add(role_ninja).catch(handleRoleError);
             } else if(completed_kata[0] || completed_kata[1] || completed_kata[2] || completed_kata[3]) {
-                member_roles.add(role_samurai);
+                member_roles.add(role_samurai).catch(handleRoleError);
             }
 
             //A role was assigned
