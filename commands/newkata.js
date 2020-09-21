@@ -1,15 +1,6 @@
 const axios = require('axios');
 
-//member.roles.cache.some(role => role.name === 'Mod');
 function execute(message, args, user_data) {
-    const is_moderator = message.member.roles.cache.some(role => role.name.toLowerCase().startsWith('moderator'));
-    const is_admin = message.member.hasPermission(['ADMINISTRATOR']);
-    
-    if (!is_moderator && !is_admin) {
-        message.channel.send("Hmmm, adequate permission you have not! Moderator you must be."); //Get it? Its Yoda.
-        return;
-    }
-
     if (args.length != 3) {
         message.channel.send("I don't understand the command. This is the correct syntax:" +
                              "`!sensei newkata <kata_level> <kata_id_or_slug>`");
@@ -25,12 +16,16 @@ function execute(message, args, user_data) {
         .then(response => {
             message.channel.send(`Kata ${args[1]} has been set to \`${response.data.name}\`!`);
 
-            //Kata list does not exist
-            if (user_data["kata_list"] == null) {
-                user_data["kata_list"] = [];
+            if (user_data[message.guild.id] == null) {
+                user_data[message.guild.id] = {};
             }
 
-            user_data["kata_list"][args[1] - 1] = { "name": response.data.name, "id": args[2] };
+            //Kata list does not exist
+            if (user_data[message.guild.id]["kata_list"] == null) {
+                user_data[message.guild.id]["kata_list"] = [];
+            }
+
+            user_data[message.guild.id]["kata_list"][args[1] - 1] = { "name": response.data.name, "id": args[2] };
         })
         .catch(error => {
             if (error.response.status == 404) {
@@ -43,5 +38,7 @@ function execute(message, args, user_data) {
 
 module.exports = {
     name: "newkata",
+    needs_privilege: true,
+    channel_name: "moderators",
     callback: execute
 }

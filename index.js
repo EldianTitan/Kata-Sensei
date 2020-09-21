@@ -29,10 +29,6 @@ var user_data = {};
     if (user_data_contents.toString().trim() != "") {
         user_data = JSON.parse(user_data_contents);
     }
-
-    if (user_data["users"] == null) {
-        user_data["users"] = {}
-    }
 }
 
 //Register bot commands
@@ -64,8 +60,21 @@ client.on('message', message => {
 
     for (const command of command_registry) {
         if (args[0] === command.name) {
-            command.callback(message, args, user_data);
             valid_command = true;
+
+            if (command.needs_privilege) {
+                const is_moderator = message.member.roles.cache.some(role => role.name.toLowerCase().startsWith('moderator'));
+                const is_admin = message.member.hasPermission(['ADMINISTRATOR']);
+                
+                if (!is_moderator && !is_admin) {
+                    message.channel.send("Hmmm, adequate permission you have not! Moderator you must be."); //Get it? Its Yoda.
+                    break;
+                }
+            }
+
+            if (command.channel_name && message.channel.name === command.channel_name) {
+                command.callback(message, args, user_data);
+            }
             
             break;
         }
@@ -77,6 +86,81 @@ client.on('message', message => {
         return;
     }
 });
+
+//Create timing fuinctions to keep track of roles
+const one_hour_ms = 60 * 60 * 1000;
+const one_week_ms = 7 * 24 * one_hour_ms;
+
+function clearUserRoles(guild_id, user_id, user) {
+    user["role_update_time"] = null;
+
+    client.guilds.fetch(guild_id).then(guild => {
+        const role_cache = guild.roles.cache;
+        const role_samurai = role_cache.find(r => r.name.startsWith("Kata Samurai"));
+        const role_ninja = role_cache.find(r => r.name.startsWith("Kata Ninja"));
+        const role_shogun = role_cache.find(r => r.name.startsWith("Kata Shogun"));
+        const role_god = role_cache.find(r => r.name.startsWith("Kata God"));
+
+        guild.members.fetch(user_id).then(member => {
+            member.roles.remove(role_god);
+            member.roles.remove(role_shogun);
+            member.roles.remove(role_ninja);
+            member.roles.remove(role_samurai);
+
+            //TODO: Print message
+        }).catch(err => {
+            console.error("Error: ", err);
+        });
+    }).catch(err => {
+        console.error("Error: ", err);
+    });
+}
+
+function narrowUpdateRoles(guild_id, user_id, user) {
+    if (user == null) {
+        return;
+    }
+
+    const current_time = Date.now();
+    const end_time = user["role_update_time"] + one_week_ms;
+    const remaining_time = end_time - current_time;
+
+    if (remaining_time <= 0) {
+        clearUserRoles(guild_id, user_id, user);
+        return;
+    }
+
+    //Create timeout event for user
+    setTimeout(clearUserRoles, remaining_time, guild_id, user_id, user);
+}
+
+function broadUpdateRoles() {
+    for (const guild_id in user_data) {
+        var guild_data = user_data[guild_id];
+
+        if (guild_data["users"] == null) {
+            continue;
+        }
+
+        const current_time = Date.now();
+    
+        for (const user_id in guild_data["users"]) {
+            var user = guild_data["users"][user_id];
+            if (user["role_update_time"] == null) {
+                continue;
+            }
+    
+            const end_time = user["role_update_time"] + one_week_ms;
+            const remaining_time = end_time - current_time;
+            
+            //If remaining time is less that one hour,
+            //create a timer to keep track of role
+            if (remaining_time <= one_hour_ms) {
+                narrowUpdateRoles(guild_id, user_id, user);
+            }
+        }
+    }
+}
 
 //Create an event handler for when the bot terminates
 process.stdin.resume();
@@ -106,3 +190,6 @@ process.on('SIGUSR2', exitCallback.bind(null, { exit: true }));
 
 //Launch the bot
 client.login(config_file.token);
+
+broadUpdateRoles();
+setInterval(broadUpdateRoles, one_week_ms);
