@@ -72,7 +72,7 @@ client.on('message', message => {
                 }
             }
 
-            if (command.channel_name && message.channel.name === command.channel_name) {
+            if (!command.channel_name || (command.channel_name && message.channel.name === command.channel_name)) {
                 command.callback(message, args, user_data);
             }
             
