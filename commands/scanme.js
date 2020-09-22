@@ -1,7 +1,45 @@
+const Discord = require('discord.js');
 const axios = require('axios');
 
 function handleRoleError(error) {
     console.log(error);
+}
+
+function getRandomRoleMessage(level) {
+    const messages = [ [
+        "Now entering Hanamura.",
+        "Welcome to Summer's Rift.",
+        "Impressive!",
+        "The Force is strong with this one.",
+        "I stopped caring a long time ago.",
+        "I don't care what they say about me. I just want to eat.",
+        "The doctor is in.",
+        "That's my spot!"
+    ],
+    [
+        "I've done a lot more for a lot less.",
+        "I can do this all day.",
+        "I am Beyonce always.",
+        "Sometimes you gotta work a little so you can ball a lot!",
+        "I'm exceedingly smart."
+    ],
+    [
+        "Legendary!",
+        "You have my respect, Stark.",
+        "We have a Hulk.",
+        "Killing spree."
+    ],
+    [
+        "...Destiny still arrives. Or should I say, I have.",
+        "Godlike!",
+        "Power! Unlimited power!",
+        "SILENCE, MORTALS!"
+    ] ];
+
+    const lvl_index = parseInt(Math.random() * level);
+    const message_index = parseInt(Math.random() * messages[lvl_index].length);
+
+    return messages[lvl_index][message_index];
 }
 
 function execute(message, args, user_data) {
@@ -74,18 +112,54 @@ function execute(message, args, user_data) {
             //Assign roles
             if (completed_kata[0] && completed_kata[1] && completed_kata[2] && completed_kata[3]) {
                 member_roles.add(role_god).catch(handleRoleError);
+                role_level = 1;
             } else if (completed_kata[0] && completed_kata[1] && completed_kata[2]) {
                 member_roles.add(role_shogun).catch(handleRoleError);
+                role_level = 2;
             } else if (completed_kata[0] && completed_kata[1]) {
                 member_roles.add(role_ninja).catch(handleRoleError);
+                role_level = 3;
             } else if(completed_kata[0] || completed_kata[1] || completed_kata[2] || completed_kata[3]) {
                 member_roles.add(role_samurai).catch(handleRoleError);
+                role_level = 4;
             }
 
             //A role was assigned
-            if (completed_kata[0] || completed_kata[1] || completed_kata[2] || completed_kata[3]) {
+            if (role_level > 0) {
                 //Set role update time
                 guild_data["users"][message.author.id]["role_update_time"] = Date.now();
+
+                var role_name = "";
+                var role_color = "";
+
+                switch(role_level) {
+                case 1:
+                    role_name = "Kata Samurai";
+                    role_color = "#3498DB";
+                    break;
+                case 2:
+                    role_name = "Kata Ninja";
+                    role_color = "#EE0BE4";
+                    break;
+                case 3:
+                    role_name = "Kata Shogun";
+                    role_color = "#FF8000";
+                    break;
+                case 4:
+                    role_name = "Kata God";
+                    role_color = "#F1C40F";
+                    break;
+                default:
+                    role_name = "Wait, what?";
+                    break;
+                }
+
+                const roleChangeEmbed = new Discord.MessageEmbed()
+                    .setTitle(`${message.author.username} is now a ${role_name}!`)
+                    .setDescription(getRandomRoleMessage(role_level))
+                    .setColor(role_color);
+
+                message.channel.send(roleChangeEmbed);
             }
         })
         .catch(error => {
