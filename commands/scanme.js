@@ -109,19 +109,21 @@ function execute(message, args, user_data) {
             member_roles.remove(role_ninja).catch(handleRoleError);
             member_roles.remove(role_samurai).catch(handleRoleError);
 
+            var role_level = 0;
+
             //Assign roles
             if (completed_kata[0] && completed_kata[1] && completed_kata[2] && completed_kata[3]) {
                 member_roles.add(role_god).catch(handleRoleError);
-                role_level = 1;
+                role_level = 4;
             } else if (completed_kata[0] && completed_kata[1] && completed_kata[2]) {
                 member_roles.add(role_shogun).catch(handleRoleError);
-                role_level = 2;
+                role_level = 3;
             } else if (completed_kata[0] && completed_kata[1]) {
                 member_roles.add(role_ninja).catch(handleRoleError);
-                role_level = 3;
+                role_level = 2;
             } else if(completed_kata[0] || completed_kata[1] || completed_kata[2] || completed_kata[3]) {
                 member_roles.add(role_samurai).catch(handleRoleError);
-                role_level = 4;
+                role_level = 1;
             }
 
             //A role was assigned
@@ -160,6 +162,13 @@ function execute(message, args, user_data) {
                     .setColor(role_color);
 
                 message.channel.send(roleChangeEmbed);
+            } else {
+                const roleEmbed = new Discord.MessageEmbed()
+                    .setTitle("Nothing to report yet!")
+                    .setDescription("Keep trying. You can do it!")
+                    .setColor("#99AAB5");
+
+                message.channel.send(roleEmbed);
             }
         })
         .catch(error => {
