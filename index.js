@@ -93,6 +93,7 @@ const one_week_ms = 7 * 24 * one_hour_ms;
 
 function clearUserRoles(guild_id, user_id, user) {
     user["role_update_time"] = null;
+    user["role_level"] = null;
 
     client.guilds.fetch(guild_id).then(guild => {
         const role_cache = guild.roles.cache;

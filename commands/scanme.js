@@ -126,10 +126,13 @@ function execute(message, args, user_data) {
                 role_level = 1;
             }
 
+            const current_role = guild_data["users"][message.author.id]["role_level"];
+
             //A role was assigned
-            if (role_level > 0) {
+            if (role_level > 0 && (!current_role || current_role < role_level)) {
                 //Set role update time
                 guild_data["users"][message.author.id]["role_update_time"] = Date.now();
+                guild_data["users"][message.author.id]["role_level"] = role_level;
 
                 var role_name = "";
                 var role_color = "";
