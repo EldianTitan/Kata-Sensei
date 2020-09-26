@@ -1,6 +1,16 @@
 const Discord = require('discord.js');
 const axios = require('axios');
 
+var random_index = parseInt(50 * Math.random());
+
+function numberSequential(offset, length) {
+    return (random_index++ % length) + offset;
+}
+
+function numberRandom(offset, length) {
+    return parseInt(Math.random() * length + offset);
+}
+
 function handleRoleError(error) {
     console.log(error);
 }
@@ -8,36 +18,48 @@ function handleRoleError(error) {
 function getRandomRoleMessage(level) {
     const messages = [ [
         "Now entering Hanamura.",
-        "Welcome to Summer's Rift.",
         "Impressive!",
         "The Force is strong with this one.",
-        "I stopped caring a long time ago.",
-        "I don't care what they say about me. I just want to eat.",
-        "The doctor is in.",
-        "That's my spot!"
+        "Welcome to Summer's Rift."
     ],
     [
+        "Unstoppable!",
         "I've done a lot more for a lot less.",
         "I can do this all day.",
-        "I am Beyonce always.",
-        "Sometimes you gotta work a little so you can ball a lot!",
-        "I'm exceedingly smart."
+        "Professionals have standards.",
+        "That's my spot."
     ],
     [
-        "Legendary!",
         "You have my respect, Stark.",
         "We have a Hulk.",
-        "Killing spree."
+        "You talking to me?",
+        "I'm exceedingly smart.",
+        "Samurais, Ninjas, Shoguns... So many snacks, so little time."
     ],
     [
         "...Destiny still arrives. Or should I say, I have.",
-        "Godlike!",
+        "There is no spoon!",
         "Power! Unlimited power!",
-        "SILENCE, MORTALS!"
+        "AVADA KEDAVRA!"
     ] ];
 
-    const lvl_index = parseInt(Math.random() * level);
-    const message_index = parseInt(Math.random() * messages[lvl_index].length);
+    var lvl_index = 0;
+    switch(level) {
+    case 1:
+        lvl_index = numberRandom(0, 1);
+        break;
+    case 2:
+        lvl_index = numberRandom(0, 2);
+        break;
+    case 3:
+        lvl_index = numberRandom(1, 2);
+        break;
+    case 4:
+        lvl_index = numberRandom(2, 2);
+        break;
+    }
+
+    const message_index = numberSequential(0, messages[lvl_index].length);
 
     return messages[lvl_index][message_index];
 }
@@ -127,7 +149,7 @@ function execute(message, args, user_data) {
             }
 
             const current_role = guild_data["users"][message.author.id]["role_level"];
-
+            
             //A role was assigned
             if (role_level > 0 && (!current_role || current_role < role_level)) {
                 //Set role update time
