@@ -123,58 +123,135 @@ function execute(message, args, user_data) {
                     }
                 }
             }
-
-            //Clear existing roles
-            var member_roles = message.member.roles;
-            member_roles.remove(role_god).catch(handleRoleError);
-            member_roles.remove(role_shogun).catch(handleRoleError);
-            member_roles.remove(role_ninja).catch(handleRoleError);
-            member_roles.remove(role_samurai).catch(handleRoleError);
+            
+            var updateRole = false;
+            const current_role = guild_data["users"][message.author.id]["role_level"];
 
             var role_level = 0;
-
-            //Assign roles
+    
+            //Assign role
             if (completed_kata[0] && completed_kata[1] && completed_kata[2] && completed_kata[3]) {
-                member_roles.add(role_god).catch(handleRoleError);
                 role_level = 4;
             } else if (completed_kata[0] && completed_kata[1] && completed_kata[2]) {
-                member_roles.add(role_shogun).catch(handleRoleError);
                 role_level = 3;
             } else if (completed_kata[0] && completed_kata[1]) {
-                member_roles.add(role_ninja).catch(handleRoleError);
                 role_level = 2;
             } else if(completed_kata[0] || completed_kata[1] || completed_kata[2] || completed_kata[3]) {
-                member_roles.add(role_samurai).catch(handleRoleError);
                 role_level = 1;
             }
-
-            const current_role = guild_data["users"][message.author.id]["role_level"];
             
+            if (current_role) {
+                if (current_role < role_level) {
+                    //A better role has been acquired
+                    updateRole = true;
+                } else if (current_role > role_level) {
+                    var current_role_name = "";
+                    var new_role_name = "";
+
+                    //Find role names
+                    switch(current_role) {
+                    case 1:
+                        current_role_name = "Kata Samurai";
+                        break;
+                    case 2:
+                        current_role_name = "Kata Ninja";
+                        break;
+                    case 3:
+                        current_role_name = "Kata Shogun";
+                        break;
+                    case 4:
+                        current_role_name = "Kata God";
+                        break;
+                    default:
+                        current_role_name = "Wait, what?";
+                        break;
+                    }
+
+                    switch(role_level) {
+                    case 1:
+                        new_role_name = "Kata Samurai";
+                        break;
+                    case 2:
+                        new_role_name = "Kata Ninja";
+                        break;
+                    case 3:
+                        new_role_name = "Kata Shogun";
+                        break;
+                    case 4:
+                        new_role_name = "Kata God";
+                        break;
+                    default:
+                        new_role_name = "Wait, what?";
+                        break;
+                    }
+
+                    //Send role message
+                    const roleEmbed = new Discord.MessageEmbed()
+                        .setTitle(`Your rank is ${new_role_name}. You will stay as ${current_role_name} until it expires!`)
+                        .setDescription("Scan yourself again after your current role expires!")
+                        .setColor("#99AAB5");
+
+                    message.channel.send(roleEmbed);
+
+                    updateRole = false;
+                } else {
+                    const roleEmbed = new Discord.MessageEmbed()
+                        .setTitle("Nothing to report yet!")
+                        .setDescription("Keep trying. You can do it!")
+                        .setColor("#99AAB5");
+    
+                    message.channel.send(roleEmbed);
+                }
+            } else {
+                //No previous role
+                updateRole = true;
+            }
+
             //A role was assigned
-            if (role_level > 0 && (!current_role || current_role < role_level)) {
+            if (updateRole && role_level > 0) {
+                //Clear existing roles
+                var member_roles = message.member.roles;
+                member_roles.remove(role_god).catch(handleRoleError);
+                member_roles.remove(role_shogun).catch(handleRoleError);
+                member_roles.remove(role_ninja).catch(handleRoleError);
+                member_roles.remove(role_samurai).catch(handleRoleError);
+                
                 //Set role update time
                 guild_data["users"][message.author.id]["role_update_time"] = Date.now();
                 guild_data["users"][message.author.id]["role_level"] = role_level;
 
+                //Set new role and send role update meesage
                 var role_name = "";
                 var role_color = "";
 
                 switch(role_level) {
                 case 1:
+                    member_roles.add(role_samurai).catch(handleRoleError);
+
                     role_name = "Kata Samurai";
                     role_color = "#3498DB";
+
                     break;
                 case 2:
+                    member_roles.add(role_ninja).catch(handleRoleError);
+
                     role_name = "Kata Ninja";
                     role_color = "#EE0BE4";
+
                     break;
                 case 3:
+                    member_roles.add(role_shogun).catch(handleRoleError);
+
                     role_name = "Kata Shogun";
                     role_color = "#FF8000";
+
                     break;
                 case 4:
+                    member_roles.add(role_god).catch(handleRoleError);
+
                     role_name = "Kata God";
                     role_color = "#F1C40F";
+
                     break;
                 default:
                     role_name = "Wait, what?";
@@ -187,13 +264,6 @@ function execute(message, args, user_data) {
                     .setColor(role_color);
 
                 message.channel.send(roleChangeEmbed);
-            } else {
-                const roleEmbed = new Discord.MessageEmbed()
-                    .setTitle("Nothing to report yet!")
-                    .setDescription("Keep trying. You can do it!")
-                    .setColor("#99AAB5");
-
-                message.channel.send(roleEmbed);
             }
         })
         .catch(error => {
