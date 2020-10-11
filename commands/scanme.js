@@ -94,7 +94,7 @@ function execute(message, args, user_data) {
             }
 
             var guild_data = user_data[message.guild.id];
-
+            
             //No katas registered
             if (guild_data["kata_list"] == null) {
                 return;
@@ -264,6 +264,13 @@ function execute(message, args, user_data) {
                     .setColor(role_color);
 
                 message.channel.send(roleChangeEmbed);
+            } else if (updateRole && role_level == 0) {
+                const roleEmbed = new Discord.MessageEmbed()
+                    .setTitle("Nothing to report yet!")
+                    .setDescription("Keep trying. You can do it!")
+                    .setColor("#99AAB5");
+
+                message.channel.send(roleEmbed);
             }
         })
         .catch(error => {
