@@ -16,7 +16,7 @@ function execute(message, args, user_data) {
               value: '`!sensei registerme <codewars_username>`: Register yourself with KataSensei. ' +
               'You only need to do this once. Replace *<codewars_username>* with you CodeWars username. ' + 
               'Capitalization matters.' },
-            { name: '\u200B', value: '`!sensei scaneme`: ' +
+            { name: '\u200B', value: '`!sensei scanme`: ' +
               'Scan yourself for completed challenges to get new roles. REMEMBER TO REGISTER FIRST!' }
         )
         .setTimestamp()
