@@ -1,7 +1,20 @@
 const Discord = require('discord.js');
 
-const path = require('path');
 const fs = require('fs');
+
+const timing = require("./commands/mytime.js")
+
+function getNowAsString() {
+    var current_date = new Date(); 
+    return current_date.getHours() + ":"  
+           + current_date.getMinutes() + ":" 
+           + current_date.getSeconds() + " "
+           + current_date.getDate() + "/"
+           + (current_date.getMonth() + 1)  + "/" 
+           + current_date.getFullYear();
+}
+
+console.log("Starting Kata-Sensei session at " + getNowAsString());
 
 //Setup bot client instance
 const client = new Discord.Client();
@@ -92,6 +105,8 @@ const one_hour_ms = 60 * 60 * 1000;
 const one_week_ms = 7 * 24 * one_hour_ms;
 
 function clearUserRoles(guild_id, user_id, user) {
+    console.log("Clearing role for user: ", user["username"]);
+
     user["role_update_time"] = null;
     user["role_level"] = null;
 
@@ -136,6 +151,8 @@ function narrowUpdateRoles(guild_id, user_id, user) {
 }
 
 function broadUpdateRoles() {
+    console.log("Performing broad role update");
+
     for (const guild_id in user_data) {
         var guild_data = user_data[guild_id];
 
@@ -153,10 +170,12 @@ function broadUpdateRoles() {
     
             const end_time = user["role_update_time"] + one_week_ms;
             const remaining_time = end_time - current_time;
-            
+
             //If remaining time is less that one hour,
             //create a timer to keep track of role
             if (remaining_time <= one_hour_ms) {
+                console.log("Triggering narrow update for " + user["username"] + " (Time: " + timing.millisToStringDate(remaining_time) + ")");
+
                 narrowUpdateRoles(guild_id, user_id, user);
             }
         }
@@ -169,6 +188,7 @@ process.stdin.resume();
 function exitCallback(options, exitCode) {
     if (options.cleanup) {
         console.log("*In Darth Vader's voice*: Nooooooooo!");
+        console.log("Ended session at " + getNowAsString());
 
         const data = JSON.stringify(user_data);
         fs.writeFileSync(user_data_file, data);
@@ -193,4 +213,4 @@ process.on('SIGUSR2', exitCallback.bind(null, { exit: true }));
 client.login(config_file.token);
 
 broadUpdateRoles();
-setInterval(broadUpdateRoles, one_week_ms);
+setInterval(broadUpdateRoles, one_hour_ms);

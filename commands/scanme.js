@@ -97,6 +97,11 @@ function execute(message, args, user_data) {
             
             //No katas registered
             if (guild_data["kata_list"] == null) {
+                const roleEmbed = new Discord.MessageEmbed()
+                    .setTitle("You haven't registered any katas yet!")
+                    .setColor("#550011");
+                message.channel.send(roleEmbed);
+                
                 return;
             }
 
